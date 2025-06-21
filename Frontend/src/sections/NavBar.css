@@ -1,0 +1,432 @@
+/* NavBar.css - Modern, creative UI for Aurora */
+
+/* Custom Properties */
+:root {
+  --primary: #0078d4;
+  --primary-light: rgba(0, 120, 212, 0.15);
+  --primary-dark: #005fa3;
+  --text-dark: #2a3a5e;
+  --text-light: #4a5a7a;
+  --background: rgba(255, 255, 255, 0.95);
+  --nav-height: 80px;
+  --nav-height-scrolled: 70px;
+  --border-radius: 8px;
+  --transition-speed: 0.3s;
+}
+
+/* Navbar Container */
+.navbar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--nav-height);
+  display: flex;
+  justify-content: center;
+  align-items: center;  background: var(--background);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+  z-index: 1000;
+  transition: height var(--transition-speed) ease, 
+              box-shadow var(--transition-speed) ease;
+}
+
+.navbar.scrolled {
+  height: var(--nav-height-scrolled);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.navbar-content {
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Logo Styles */
+.logo {
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: var(--text-dark);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  letter-spacing: -0.5px;
+  position: relative;
+  cursor: pointer;
+  transition: none;
+}
+
+.logo:hover {
+  transform: none;
+  animation: none;
+}
+
+.logo:hover .logo-highlight {
+  background-size: 0% 3px;
+}
+
+.logo-highlight {
+  color: var(--primary);
+  background-image: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background-size: 0% 3px;
+  background-repeat: no-repeat;
+  background-position: 0 90%;
+  transition: background-size 0.4s ease;
+}
+
+/* Logo particle effects */
+.logo-particles {
+  display: none;
+}
+
+/* Navigation Menu */
+.nav-menu {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.nav-link {
+  position: relative;
+  padding: 0.5rem 1rem;
+  margin: 0 0.2rem;
+  color: var(--text-dark);
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 1rem;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  transition: color var(--transition-speed) ease;
+  z-index: 1;
+}
+
+/* Background effect */
+.nav-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-light);
+  border-radius: var(--border-radius);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--transition-speed) ease;
+  z-index: -1;
+}
+
+.nav-link:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.nav-link:hover {
+  color: var(--primary);
+}
+
+/* Underline effect */
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--primary);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform var(--transition-speed) ease;
+}
+
+.nav-link:hover::after {
+  transform: scaleX(1);
+}
+
+/* Active link styles */
+.nav-link.active {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.nav-link.active::after {
+  transform: scaleX(0.6);
+  animation: pulseWidth 2s infinite;
+}
+
+/* Glow effect for active links */
+.nav-link.active::before {
+  background: var(--primary-light);
+  transform: scaleX(1);
+  opacity: 0.7;
+}
+
+/* Mobile menu trigger */
+.mobile-menu-trigger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+}
+
+.mobile-menu-trigger span {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background: var(--text-dark);
+  border-radius: 3px;
+  transition: all 0.3s linear;
+}
+
+/* Progress indicator for scroll position */
+.navbar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+  width: 0%;
+  transition: width 0.1s ease;
+}
+
+.navbar.scrolled::after {
+  width: var(--scroll-width, 0%);
+}
+
+/* Theme toggle and notification indicator styles */
+.nav-utilities {
+  display: flex;
+  align-items: center;
+  margin-left: 1.5rem;
+}
+
+.theme-toggle {
+  position: relative;
+  width: 50px;
+  height: 26px;
+  margin-left: 10px;
+  border-radius: 15px;
+  background: var(--text-light);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.theme-toggle.dark {
+  background: var(--primary);
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle.dark .toggle-thumb {
+  transform: translateX(24px);
+}
+
+.toggle-icon {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.theme-toggle.dark .toggle-icon {
+  color: var(--primary);
+}
+
+.notification-indicator {
+  position: relative;
+  margin-left: 20px;
+  cursor: pointer;
+}
+
+.notification-icon {
+  color: var(--text-dark);
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+}
+
+.notification-icon:hover {
+  color: var(--primary);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 2s infinite;
+}
+
+/* Animations */
+@keyframes particle-animation {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(var(--x, 20px), var(--y, -20px));
+    opacity: 0;
+  }
+}
+
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 5px rgba(0, 120, 212, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(0, 120, 212, 0.5), 0 0 20px rgba(0, 120, 212, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(0, 120, 212, 0.3);
+  }
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+@keyframes pulseWidth {
+  0% {
+    transform: scaleX(0.6);
+    opacity: 1;
+  }
+  50% {
+    transform: scaleX(0.8);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scaleX(0.6);
+    opacity: 1;
+  }
+}
+
+/* Click animation for nav links */
+@keyframes linkClick {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.nav-link-clicked {
+  animation: linkClick 0.3s ease;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .navbar {
+    height: auto;
+    padding: 1rem 0;
+  }
+  
+  .navbar-content {
+    flex-wrap: wrap;
+    padding: 0 1.5rem;
+  }
+  
+  .mobile-menu-trigger {
+    display: flex;
+  }
+  
+  .nav-menu {
+    position: absolute;
+    top: var(--nav-height-scrolled);
+    left: 0;
+    width: 100%;
+    flex-direction: column;
+    background: var(--background);
+    padding: 1rem 0;
+    gap: 0.8rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-20px);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform var(--transition-speed) ease,
+                opacity var(--transition-speed) ease;
+  }
+  
+  .nav-menu.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: all;
+  }
+  
+  .nav-link {
+    width: 90%;
+    text-align: center;
+    padding: 0.8rem 1rem;
+  }
+  
+  .mobile-menu-trigger.active span:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+    background: var(--primary);
+  }
+  
+  .mobile-menu-trigger.active span:nth-child(2) {
+    opacity: 0;
+  }
+  
+  .mobile-menu-trigger.active span:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+    background: var(--primary);
+  }
+  
+  .nav-utilities {
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    margin: 0.5rem 0 0 0;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(42, 58, 94, 0.1);
+  }
+}
+
+.logo-robo {
+  height: 54px;
+  width: 54px;
+  margin-right: 0.6rem;
+  object-fit: contain;
+  vertical-align: middle;
+}

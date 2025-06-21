@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurora - Resume Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .upload-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px dashed #dee2e6;
+            text-align: center;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            border: none;
+            transition: transform 0.2s;
+        }
+
+        .file-input-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .upload-btn {
+            background: #28a745;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .upload-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .keywords-section {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .keywords-section h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .keyword-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .keyword-tag {
+            background: #1976d2;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        .questions-section {
+            background: #f3e5f5;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .questions-section h3 {
+            color: #7b1fa2;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .question-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #7b1fa2;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .question-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #c62828;
+        }
+
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .file-info {
+            margin-top: 10px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .interview-section {
+            background: #fff3e0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .interview-status {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.2rem;
+            color: #e65100;
+        }
+        
+        .progress-indicator {
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .answer-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e65100;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .interview-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .interview-btn {
+            background: #e65100;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .interview-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .interview-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .current-question {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #e65100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Aurora</h1>
+            <p>AI-Powered Resume Analyzer & Interview Question Generator</p>
+            </div>
+            
+        <div class="upload-section">
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="file-input-wrapper">
+                    <input type="file" id="resume" name="resume" accept=".pdf" class="file-input">
+                    <label for="resume" class="file-input-button">
+                        📄 Choose Resume (PDF)
+                    </label>
+                </div>
+                <div class="file-info" id="fileInfo"></div>
+                <br>
+                <button type="submit" class="upload-btn" id="uploadBtn" disabled>
+                    🚀 Analyze Resume
+            </button>
+        </form>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Analyzing your resume and generating interview questions...</p>
+        </div>
+        
+        <div id="message"></div>
+        
+        <div class="results" id="results">
+            <div class="keywords-section" id="keywordsSection">
+                <h3>🔍 Technical Skills Found</h3>
+                <div class="keyword-tags" id="keywordTags"></div>
+            </div>
+            
+            <div class="questions-section" id="questionsSection">
+                <h3>❓ Interview Questions for You</h3>
+                <div id="questionsList"></div>
+            </div>
+
+            <div class="interview-section" id="interviewSection">
+                <h3>📝 Interview Session</h3>
+                <div class="interview-status" id="interviewStatus">
+                    Ready to begin interview...
+                </div>
+                <div class="progress-indicator" id="progressIndicator"></div>
+                
+                <div class="current-question" id="currentQuestion"></div>
+                
+                <div class="answer-section">
+                    <textarea id="answerInput" class="answer-input" placeholder="Type your answer here..."></textarea>
+                    <div class="interview-controls">
+                        <button id="startInterviewBtn" class="interview-btn">
+                            🚀 Start Interview
+                        </button>
+                        <button id="submitAnswerBtn" class="interview-btn" disabled>
+                            ✅ Submit Answer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('resume');
+        const fileInfo = document.getElementById('fileInfo');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const uploadForm = document.getElementById('uploadForm');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const message = document.getElementById('message');
+        const interviewSection = document.getElementById('interviewSection');
+        const interviewStatus = document.getElementById('interviewStatus');
+        const currentQuestion = document.getElementById('currentQuestion');
+        const answerInput = document.getElementById('answerInput');
+        const startInterviewBtn = document.getElementById('startInterviewBtn');
+        const submitAnswerBtn = document.getElementById('submitAnswerBtn');
+
+        let currentSession = {
+            questionsFile: null,
+            currentIndex: 0,
+            questions: []
+        };
+
+        // Handle start interview
+        startInterviewBtn.addEventListener('click', () => {
+            interviewSection.style.display = 'block';
+            startInterviewBtn.disabled = true;
+            showCurrentQuestion();
+        });
+
+        function showCurrentQuestion() {
+            const question = document.querySelector(`#questionsList .question-item:nth-child(${currentSession.currentIndex + 1})`);
+            if (!question) return;
+
+            currentQuestion.innerHTML = `<strong>Question ${currentSession.currentIndex + 1}:</strong> ${question.textContent}`;
+            updateInterviewStatus('Please provide your answer...');
+            updateProgress();
+            submitAnswerBtn.disabled = false;
+        }
+
+        // Handle submit answer
+        submitAnswerBtn.addEventListener('click', async () => {
+            const answer = answerInput.value.trim();
+            if (!answer) {
+                showMessage('Please provide an answer', 'error');
+                return;
+            }
+
+            try {
+                submitAnswerBtn.disabled = true;
+                updateInterviewStatus('Saving your answer...');
+
+                const response = await fetch('/submit_answer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        questions_file: currentSession.questionsFile,
+                        question_index: currentSession.currentIndex,
+                        answer: answer
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    if (data.is_last_question) {
+                        showMessage('Interview completed! Thank you for your time.', 'success');
+                        interviewSection.style.display = 'none';
+                    } else {
+                        currentSession.currentIndex++;
+                        answerInput.value = '';
+                        submitAnswerBtn.disabled = true;
+                        showCurrentQuestion();
+                    }
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Failed to submit answer', 'error');
+            }
+        });
+
+        // Handle file selection
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                fileInfo.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                uploadBtn.disabled = false;
+            } else {
+                fileInfo.textContent = '';
+                uploadBtn.disabled = true;
+            }
+        });
+
+        // Handle form submission
+        uploadForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showMessage('Please select a PDF file first.', 'error');
+                return;
+            }
+
+            formData.append('resume', file);
+
+            // Show loading state
+            loading.style.display = 'block';
+            results.style.display = 'none';
+            message.innerHTML = '';
+            uploadBtn.disabled = true;
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showResults(data);
+                    showMessage(data.message, 'success');
+                } else {
+                    showMessage(data.error, 'error');
+                    if (data.troubleshooting) {
+                        let troubleshootMsg = '<br><br><strong>Troubleshooting:</strong><ul>';
+                        data.troubleshooting.forEach(tip => {
+                            troubleshootMsg += `<li>${tip}</li>`;
+                        });
+                        troubleshootMsg += '</ul>';
+                        document.getElementById('message').innerHTML += troubleshootMsg;
+                    }
+                }
+            } catch (error) {
+                showMessage('An error occurred while processing your resume. Please try again.', 'error');
+                console.error('Upload error:', error);
+            } finally {
+                loading.style.display = 'none';
+                uploadBtn.disabled = false;
+            }
+        });
+
+        function showMessage(msg, type) {
+            message.innerHTML = `<div class="${type}">${msg}</div>`;
+        }
+
+        function showResults(data) {
+            // Show keywords
+            const keywordTags = document.getElementById('keywordTags');
+            keywordTags.innerHTML = '';
+            
+            if (data.matched_keywords && data.matched_keywords.length > 0) {
+                data.matched_keywords.forEach(keyword => {
+                    const tag = document.createElement('span');
+                    tag.className = 'keyword-tag';
+                    tag.textContent = keyword;
+                    keywordTags.appendChild(tag);
+                });
+            }
+
+            // Store session info
+            currentSession.questionsFile = data.questions_file;
+            currentSession.currentIndex = 0;
+            currentSession.questions = data.questions;
+
+            // Show questions
+            const questionsList = document.getElementById('questionsList');
+            questionsList.innerHTML = '';
+            
+            if (data.questions && data.questions.length > 0) {
+                data.questions.forEach((question, index) => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.className = 'question-item';
+                    
+                    let cleanQuestion = question.trim();
+                    if (!cleanQuestion.match(/^\d+\./)) {
+                        cleanQuestion = `${index + 1}. ${cleanQuestion}`;
+                    }
+                    
+                    questionDiv.innerHTML = `<strong>${cleanQuestion}</strong>`;
+                    questionsList.appendChild(questionDiv);
+                });
+
+                // Enable start interview button
+                startInterviewBtn.disabled = false;
+            }
+
+            results.style.display = 'block';
+        }
+
+        function updateInterviewStatus(message) {
+            document.getElementById('interviewStatus').textContent = message;
+        }
+
+        function updateProgress() {
+            const total = document.querySelectorAll('.question-item').length;
+            const progress = document.getElementById('progressIndicator');
+            progress.textContent = `Question ${currentSession.currentIndex + 1} of ${total}`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talking Chatbot - Question & Answer Session</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 90%;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .file-selection {
+            margin-bottom: 30px;
+        }
+
+        .file-list {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .file-item {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-item.selected {
+            border-color: #667eea;
+            background: #e8f2ff;
+        }
+
+        .question-session {
+            display: none;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .question-display {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .status {
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .status.listening {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.speaking {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #b3d7ff;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.success {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .response-display {
+            background: #e8f5e8;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-style: italic;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .completion-message {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .completion-message h2 {
+            margin-bottom: 15px;
+            font-size: 2em;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎤 Talking Chatbot</h1>
+            <p>Interactive Voice Question & Answer Session</p>
+        </div>
+
+        <!-- File Selection Section -->
+        <div class="file-selection" id="fileSelection">
+            <h3>Select a Question Set:</h3>
+            <div class="file-list" id="fileList">
+                <div class="status">Loading question sets...</div>
+            </div>
+            <div class="controls">
+                <button class="btn btn-primary" id="startBtn" onclick="startSession()" disabled>
+                    Start Session
+                </button>
+            </div>
+        </div>
+
+        <!-- Question Session Section -->
+        <div class="question-session" id="questionSession">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="status" id="questionInfo">
+                Question 1 of 5
+            </div>
+
+            <div class="question-display" id="questionDisplay">
+                Your question will appear here...
+            </div>
+
+            <div class="status" id="statusDisplay" style="display: none;">
+                Status updates will appear here...
+            </div>
+
+            <div class="response-display" id="responseDisplay" style="display: none;">
+                Your response will appear here...
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-primary" id="speakBtn" onclick="speakQuestion()">
+                    🔊 Speak Question
+                </button>
+                <button class="btn btn-primary" id="listenBtn" onclick="listenForResponse()" disabled>
+                    🎤 Listen for Answer
+                </button>
+                <button class="btn btn-secondary" id="skipBtn" onclick="skipQuestion()">
+                    ⏭️ Skip Question
+                </button>
+                <button class="btn btn-danger" id="backBtn" onclick="goBack()">
+                    🔙 Back to Selection
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSession = null;
+        let selectedFile = null;
+        let currentQuestionIndex = 0;
+        let totalQuestions = 0;
+
+        // Load available question files on page load
+        window.onload = function() {
+            loadQuestionFiles();
+        };
+
+        async function loadQuestionFiles() {
+            try {
+                const response = await fetch('/api/load_questions');
+                const data = await response.json();
+                
+                if (data.error) {
+                    document.getElementById('fileList').innerHTML = 
+                        `<div class="status error">Error: ${data.error}</div>`;
+                    return;
+                }
+
+                const fileList = document.getElementById('fileList');
+                
+                if (data.files.length === 0) {
+                    fileList.innerHTML = 
+                        '<div class="status">No question files found in the questions folder.</div>';
+                    return;
+                }
+
+                fileList.innerHTML = data.files.map(file => `
+                    <div class="file-item" onclick="selectFile('${file.filename}')" data-filename="${file.filename}">
+                        <h4>${file.session_id}</h4>
+                        <p><strong>File:</strong> ${file.filename}</p>
+                        <p><strong>Timestamp:</strong> ${file.timestamp}</p>
+                        <p><strong>Progress:</strong> ${file.current_question}/${file.total_questions} questions</p>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                document.getElementById('fileList').innerHTML = 
+                    `<div class="status error">Error loading files: ${error.message}</div>`;
+            }
+        }
+
+        function selectFile(filename) {
+            // Remove previous selection
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Select current file
+            document.querySelector(`[data-filename="${filename}"]`).classList.add('selected');
+            selectedFile = filename;
+            document.getElementById('startBtn').disabled = false;
+        }
+
+        async function startSession() {
+            if (!selectedFile) {
+                alert('Please select a question file first.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/start_session/${selectedFile}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert(`Error: ${data.error}`);
+                    return;
+                }
+
+                if (data.status === 'completed') {
+                    alert(data.message);
+                    return;
+                }
+
+                currentSession = data.session_data;
+                currentQuestionIndex = data.current_question_index;
+                totalQuestions = data.total_questions;
+
+                // Switch to question session view
+                document.getElementById('fileSelection').style.display = 'none';
+                document.getElementById('questionSession').style.display = 'block';
+
+                updateQuestionDisplay();
+                
+            } catch (error) {
+                alert(`Error starting session: ${error.message}`);
+            }
+        }
+
+        function updateQuestionDisplay() {
+            const questionNum = currentQuestionIndex + 1;
+            const progress = (questionNum / totalQuestions) * 100;
+            
+            document.getElementById('questionInfo').textContent = 
+                `Question ${questionNum} of ${totalQuestions}`;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('questionDisplay').innerHTML = 
+                currentSession.questions[currentQuestionIndex];
+            
+            // Reset buttons and displays
+            document.getElementById('speakBtn').disabled = false;
+            document.getElementById('listenBtn').disabled = true;
+            document.getElementById('statusDisplay').style.display = 'none';
+            document.getElementById('responseDisplay').style.display = 'none';
+        }
+
+        async function speakQuestion() {
+            const question = currentSession.questions[currentQuestionIndex];
+            
+            document.getElementById('speakBtn').disabled = true;
+            document.getElementById('statusDisplay').innerHTML = 
+                '<span class="loading"></span>Speaking question...';
+            document.getElementById('statusDisplay').className = 'status speaking';
+            document.getElementById('statusDisplay').style.display = 'block';
+
+            try {
+                const response = await fetch('/api/speak_question', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question: question })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                // Wait a moment for speech to start, then enable listen button
+                setTimeout(() => {
+                    document.getElementById('speakBtn').disabled = false;
+                    document.getElementById('listenBtn').disabled = false;
+                    document.getElementById('statusDisplay').innerHTML = 
+                        'Question spoken! Click "Listen for Answer" to record your response.';
+                    document.getElementById('statusDisplay').className = 'status success';
+                }, 2000);
+                
+            } catch (error) {
+                document.getElementById('statusDisplay').innerHTML = 
+                    `Error speaking question: ${error.message}`;
+                document.getElementById('statusDisplay').className = 'status error';
+                document.getElementById('speakBtn').disabled = false;
+            }
+        }
+
+        async function listenForResponse() {
+            document.getElementById('listenBtn').disabled = true;
+            document.getElementById('statusDisplay').innerHTML = 
+                '<span class="loading"></span>Listening for your response... (30 seconds)';
+            document.getElementById('statusDisplay').className = 'status listening';
+            document.getElementById('statusDisplay').style.display = 'block';
+
+            try {
+                const response = await fetch('/api/listen_response', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        timeout: 30,
+                        filename: selectedFile,
+                        question_index: currentQuestionIndex
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                if (data.status === 'success') {
+                    document.getElementById('responseDisplay').innerHTML = 
+                        `<strong>Your Response:</strong> "${data.response}"`;
+                    document.getElementById('responseDisplay').style.display = 'block';
+                    
+                    document.getElementById('statusDisplay').innerHTML = 
+                        'Response recorded! Saving and moving to next question...';
+                    document.getElementById('statusDisplay').className = 'status success';
+                    
+                    // Save the answer
+                    await saveAnswer(data.response);
+                    
+                } else {
+                    let message = 'Could not understand your response. ';
+                    if (data.response === 'TIMEOUT') {
+                        message += 'Please try again or skip this question.';
+                    } else if (data.response === 'UNKNOWN') {
+                        message += 'Speech was unclear. Please try again.';
+                    } else {
+                        message += 'There was an error. Please try again.';
+                    }
+                    
+                    document.getElementById('statusDisplay').innerHTML = message;
+                    document.getElementById('statusDisplay').className = 'status error';
+                    document.getElementById('listenBtn').disabled = false;
+                }
+                
+            } catch (error) {
+                document.getElementById('statusDisplay').innerHTML = 
+                    `Error listening for response: ${error.message}`;
+                document.getElementById('statusDisplay').className = 'status error';
+                document.getElementById('listenBtn').disabled = false;
+            }
+        }
+
+        async function saveAnswer(answer) {
+            try {
+                const response = await fetch('/api/save_answer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        filename: selectedFile,
+                        answer: answer,
+                        question_index: currentQuestionIndex
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                if (data.status === 'completed') {
+                    showCompletionMessage(data.message);
+                } else if (data.status === 'next_question') {
+                    currentQuestionIndex = data.current_index;
+                    currentSession.questions[currentQuestionIndex] = data.next_question;
+                    
+                    setTimeout(() => {
+                        updateQuestionDisplay();
+                    }, 2000);
+                }
+                
+            } catch (error) {
+                document.getElementById('statusDisplay').innerHTML = 
+                    `Error saving answer: ${error.message}`;
+                document.getElementById('statusDisplay').className = 'status error';
+            }
+        }
+
+        async function skipQuestion() {
+            if (!confirm('Are you sure you want to skip this question?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/skip_question', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        filename: selectedFile,
+                        question_index: currentQuestionIndex
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                if (data.status === 'completed') {
+                    showCompletionMessage(data.message);
+                } else if (data.status === 'next_question') {
+                    currentQuestionIndex = data.current_index;
+                    currentSession.questions[currentQuestionIndex] = data.next_question;
+                    updateQuestionDisplay();
+                }
+                
+            } catch (error) {
+                alert(`Error skipping question: ${error.message}`);
+            }
+        }
+
+        function showCompletionMessage(message) {
+            document.getElementById('questionSession').innerHTML = `
+                <div class="completion-message">
+                    <h2>🎉 Session Complete!</h2>
+                    <p>${message}</p>
+                    <div class="controls" style="margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="goBack()">Start New Session</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function goBack() {
+            document.getElementById('fileSelection').style.display = 'block';
+            document.getElementById('questionSession').style.display = 'none';
+            
+            // Reset state
+            currentSession = null;
+            selectedFile = null;
+            currentQuestionIndex = 0;
+            totalQuestions = 0;
+            
+            // Reload files to show updated progress
+            loadQuestionFiles();
+        }
+    </script>
+</body>
+</html>

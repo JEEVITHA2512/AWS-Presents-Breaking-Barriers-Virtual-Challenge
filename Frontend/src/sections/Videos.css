@@ -1,0 +1,302 @@
+/* Videos.css - Modern, creative UI for Aurora Video Showcase */
+
+/* Custom Properties */
+:root {
+  --video-primary: #0078d4;
+  --video-primary-light: rgba(0, 120, 212, 0.15);
+  --video-primary-dark: #005fa3;
+  --video-text-dark: #2a3a5e;
+  --video-text-light: #4a5a7a;
+  --video-background: #f8fbff;
+  --video-card-bg: #ffffff;
+  --video-border-radius: 16px;
+  --video-transition-speed: 0.3s;
+  --video-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  --video-shadow-hover: 0 12px 40px rgba(0, 78, 156, 0.1);
+  --video-play-size: 60px;
+}
+
+
+/* Videos Container */
+.videos-section {
+  background-color: var(--video-background);
+  padding: 5rem 2rem;
+  transition: background-color var(--video-transition-speed) ease;
+}
+
+.videos-heading {
+  font-size: 2.5rem;
+  color: var(--video-text-dark);
+  text-align: center;
+  margin-bottom: 1rem;
+  transition: color var(--video-transition-speed) ease;
+}
+
+.videos-subtitle {
+  font-size: 1.1rem;
+  color: var(--video-text-light);
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 3rem;
+  transition: color var(--video-transition-speed) ease;
+}
+
+/* Video Grid */
+.videos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Video Card */
+.video-card {
+  background-color: var(--video-card-bg);
+  border-radius: var(--video-border-radius);
+  overflow: hidden;
+  box-shadow: var(--video-shadow);
+  transition: transform var(--video-transition-speed) ease,
+              box-shadow var(--video-transition-speed) ease,
+              background-color var(--video-transition-speed) ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.video-card:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--video-shadow-hover);
+}
+
+/* Video Thumbnail Container */
+.video-thumbnail-container {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--video-border-radius) var(--video-border-radius) 0 0;
+}
+
+.video-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.video-card:hover .video-thumbnail {
+  transform: scale(1.05);
+}
+
+/* Play Button */
+.video-play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--video-play-size);
+  height: var(--video-play-size);
+  background-color: var(--video-primary);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  opacity: 0.9;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
+}
+
+.video-play-button::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 16px solid white;
+  margin-left: 5px;
+}
+
+.video-card:hover .video-play-button {
+  transform: translate(-50%, -50%) scale(1.1);
+  opacity: 1;
+  background-color: var(--video-primary-dark);
+}
+
+/* Video Content */
+.video-content {
+  padding: 1.5rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.video-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--video-text-dark);
+  margin-bottom: 0.8rem;
+  transition: color var(--video-transition-speed) ease;
+}
+
+.video-description {
+  font-size: 1rem;
+  color: var(--video-text-light);
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+  transition: color var(--video-transition-speed) ease;
+}
+
+/* Video Statistics */
+.video-stats {
+  display: flex;
+  justify-content: space-between;
+  color: var(--video-text-light);
+  font-size: 0.85rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding-top: 1rem;
+  transition: color var(--video-transition-speed) ease;
+}
+
+.dark-theme .video-stats {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.video-date,
+.video-duration {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Video Modal */
+.video-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+ backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.video-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.video-modal-content {
+  width: 90%;
+  max-width: 900px;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.video-modal-overlay.active .video-modal-content {
+  transform: scale(1);
+}
+
+.video-modal-close {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.video-modal-close:hover {
+  opacity: 1;
+}
+
+.video-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 8px;
+}
+
+/* Animation for entering videos */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.video-card {
+  animation: fadeInUp 0.6s ease forwards;
+  opacity: 0;
+}
+
+.video-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.video-card:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.video-card:nth-child(3) {
+  animation-delay: 0.5s;
+}
+
+/* Video Carousel Transitions */
+.video-carousel-fade {
+  transition: opacity 0.35s cubic-bezier(.68,-0.55,.27,1.55), transform 0.35s cubic-bezier(.68,-0.55,.27,1.55);
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.video-carousel-fade.transitioning.left {
+  opacity: 0;
+  transform: translateX(-60px) scale(0.98);
+}
+
+.video-carousel-fade.transitioning.right {
+  opacity: 0;
+  transform: translateX(60px) scale(0.98);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .videos-heading {
+    font-size: 2rem;
+  }
+  
+  .videos-grid {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+    gap: 2rem;
+  }
+  
+  .videos-section {
+    padding: 4rem 1.5rem;
+  }
+  
+  .video-modal-content {
+    width: 95%;
+  }
+}

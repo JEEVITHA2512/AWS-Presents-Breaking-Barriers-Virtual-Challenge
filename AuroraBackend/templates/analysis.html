@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Analyzer - Results</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+        }
+
+        .hiring-decision {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .hiring-decision h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .hiring-decision .decision {
+            font-size: 1.5em;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .decision.hire {
+            background: #28a745;
+        }
+
+        .decision.conditional {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .decision.reject {
+            background: #dc3545;
+        }
+
+        .overall-assessment {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+
+        .overall-assessment h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .overall-assessment p {
+            line-height: 1.8;
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        .question-analyses {
+            margin-bottom: 30px;
+        }
+
+        .question-analyses h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .question-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .question-header {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .answer-section {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .answer-section strong {
+            color: #28a745;
+        }
+
+        .analysis-section {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .analysis-section strong {
+            color: #1976d2;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .status {
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.speaking {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #b3d7ff;
+        }
+
+        .report-file {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #6c757d;
+        }
+
+        .report-file strong {
+            color: #6c757d;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Interview Analyzer</h1>
+            <p>AI-Powered Interview Analysis & Results</p>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <h3>Analyzing Interview...</h3>
+            <p>Please wait while we process your interview data</p>
+        </div>
+
+        <div id="error" class="error-message" style="display: none;">
+            <h3>❌ Analysis Error</h3>
+            <p id="error-text"></p>
+        </div>
+
+        <div id="results" class="results">
+            <div class="hiring-decision">
+                <h2>🏆 Hiring Decision</h2>
+                <div class="decision" id="decision-text"></div>
+            </div>
+
+            <div class="overall-assessment">
+                <h3>📋 Overall Assessment</h3>
+                <p id="overall-text"></p>
+            </div>
+
+            <div id="status" class="status" style="display: none;"></div>
+
+            <div class="controls">
+                <button class="btn btn-primary" id="speakBtn" onclick="speakResults()">
+                    🔊 Speak Results
+                </button>
+                <form method="post" action="{{ url_for('cleanup') }}" style="display: inline;">
+                    <button class="btn btn-danger" type="submit">🗑️ Clean Up Files</button>
+                </form>
+            </div>
+
+            <div class="question-analyses">
+                <h3>📝 Individual Question Analyses</h3>
+                <div id="questions-container"></div>
+            </div>
+
+            <div class="report-file">
+                <strong>📄 Report File:</strong> <span id="report-file"></span>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="/">&larr; Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        // Auto-start analysis when page loads
+        window.onload = function() {
+            startAnalysis();
+        };
+
+        function startAnalysis() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+
+            fetch('/auto_analyze', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading').style.display = 'none';
+                
+                if (data.error) {
+                    showError(data.error);
+                } else {
+                    showResults(data);
+                    // Auto-speak results after a short delay
+                    setTimeout(() => {
+                        speakResults();
+                    }, 2000);
+                }
+            })
+            .catch(error => {
+                document.getElementById('loading').style.display = 'none';
+                showError('Network error: ' + error.message);
+            });
+        }
+
+        function showResults(data) {
+            document.getElementById('results').style.display = 'block';
+            
+            // Set hiring decision
+            const decisionElement = document.getElementById('decision-text');
+            decisionElement.textContent = data.overall_assessment.hiring_decision;
+            decisionElement.className = 'decision ' + getDecisionClass(data.overall_assessment.hiring_decision);
+            
+            // Set overall assessment
+            document.getElementById('overall-text').textContent = data.overall_assessment.overall_analysis;
+            
+            // Set report file
+            document.getElementById('report-file').textContent = data.report_file;
+            
+            // Build question analyses
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+            
+            data.individual_analyses.forEach(analysis => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-item';
+                questionDiv.innerHTML = `
+                    <div class="question-header">Q${analysis.question_num}: ${analysis.question}</div>
+                    <div class="answer-section">
+                        <strong>Answer:</strong> ${analysis.answer || 'No answer provided'}
+                    </div>
+                    <div class="analysis-section">
+                        <strong>Analysis:</strong> ${analysis.analysis}
+                    </div>
+                `;
+                container.appendChild(questionDiv);
+            });
+        }
+
+        function showError(message) {
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error-text').textContent = message;
+        }
+
+        function getDecisionClass(decision) {
+            if (decision.includes('HIRE') && !decision.includes('CONDITIONAL')) {
+                return 'hire';
+            } else if (decision.includes('CONDITIONAL')) {
+                return 'conditional';
+            } else {
+                return 'reject';
+            }
+        }
+
+        function speakResults() {
+            const speakBtn = document.getElementById('speakBtn');
+            const statusDiv = document.getElementById('status');
+            
+            speakBtn.disabled = true;
+            speakBtn.textContent = '🔊 Speaking...';
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'status speaking';
+            statusDiv.textContent = 'Speaking results...';
+            
+            const hiringDecision = document.getElementById('decision-text').textContent;
+            const overallAnalysis = document.getElementById('overall-text').textContent;
+            
+            fetch('/speak_results', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `hiring_decision=${encodeURIComponent(hiringDecision)}&overall_analysis=${encodeURIComponent(overallAnalysis)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = '✅ Results spoken successfully!';
+                } else {
+                    statusDiv.className = 'status error';
+                    statusDiv.textContent = '❌ Error: ' + data.message;
+                }
+            })
+            .catch(error => {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = '❌ Error: ' + error.message;
+            })
+            .finally(() => {
+                speakBtn.disabled = false;
+                speakBtn.textContent = '🔊 Speak Results';
+            });
+        }
+    </script>
+</body>
+</html> 

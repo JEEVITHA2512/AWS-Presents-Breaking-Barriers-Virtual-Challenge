@@ -1,0 +1,179 @@
+/* App.css */
+/* Global Styles */
+:root {
+  --primary: #0078d4;
+  --primary-light: rgba(0, 120, 212, 0.15);
+  --primary-dark: #005fa3;
+  --text-dark: #2a3a5e;
+  --text-light: #4a5a7a;
+  --background: #ffffff;
+  --background-alt: #f8fbff;
+  --shadow: rgba(0, 0, 0, 0.05);
+  --transition-speed: 0.3s;
+  --font-primary: 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-secondary: 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --border-radius: 8px;
+  --max-width: 1200px;
+  --header-height: 80px;
+  --focus-ring: 0 0 0 3px rgba(0, 120, 212, 0.4);
+}
+
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--background);
+  color: var(--text-dark);
+  line-height: 1.6;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+  transition: background-color var(--transition-speed) ease,
+              color var(--transition-speed) ease;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* App container */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Basic responsive adjustments */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  font-weight: 600;
+  color: var(--text-dark);
+  transition: color var(--transition-speed) ease;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Section spacing and consistency */
+section {
+  padding: 5rem 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--background);
+  transition: background-color var(--transition-speed) ease;
+}
+
+section:nth-child(even) {
+  background-color: var(--background-alt);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-alt);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+  :root {
+    --header-height: 70px;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  section {
+    padding: 3rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  section {
+    padding: 2.5rem 1rem;
+  }
+}
+
+/* Accessibility */
+:focus {
+  outline: var(--focus-ring);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Animation utility classes */
+.fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.slide-up {
+  animation: slideUp 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
